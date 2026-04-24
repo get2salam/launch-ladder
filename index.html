@@ -7,37 +7,38 @@
     <meta name="description" content="Climb from idea to release with visible launch steps and blockers." />
     <link rel="stylesheet" href="./styles/app.css" />
   </head>
-  <body style="--primary:#fbbf24;--secondary:#f97316;--panel:#1a140a;--edge:#5b3e1a;--glow:rgba(251, 191, 36, 0.24)">
+  <body style="--primary:#38bdf8;--secondary:#22d3ee;--panel:#0a141d;--edge:#275976;--glow:rgba(56, 189, 248, 0.22)">
     <div class="shell">
       <header class="topbar">
         <div>
-          <p class="eyebrow">Local-first micro app</p>
+          <p class="eyebrow">Launch planning workspace</p>
           <h1>Launch Ladder</h1>
-          <p class="lede">Climb from idea to release with visible launch steps and blockers.</p>
+          <p class="lede">Turn launches into a clearer sequence of owners, blockers, readiness signals, and target dates.</p>
         </div>
         <div class="actions">
           <button class="btn" data-action="import">Import</button>
           <button class="btn" data-action="export">Export</button>
-          <button class="btn btn-primary" data-action="new">New step</button>
+          <button class="btn btn-primary" data-action="new">New launch step</button>
           <input id="import-file" type="file" accept=".json,application/json" hidden />
         </div>
       </header>
 
       <section class="hero card">
         <div>
-          <p class="eyebrow">Steps board</p>
+          <p class="eyebrow">Launch ladder board</p>
           <h2 data-role="board-title"></h2>
           <p data-role="board-subtitle"></p>
         </div>
-        <p class="accent">A launch feels lighter when the ladder is visible.</p>
+        <p class="accent">Keep each launch step visible so readiness rises while blockers and friction get handled before release week gets messy.</p>
       </section>
 
       <section class="stats" data-role="stats"></section>
+      <section class="insights" data-role="insights"></section>
 
       <section class="controls card">
         <label>
           <span>Search</span>
-          <input type="search" data-field="search" placeholder="Search steps..." />
+          <input type="search" data-field="search" placeholder="Search launch steps, notes, and next steps..." />
         </label>
         <label>
           <span>Step type</span>
@@ -54,14 +55,19 @@
         <article class="card list-panel">
           <div class="panel-head">
             <div>
-              <strong>Steps</strong>
-              <p>Sorted by signal minus friction.</p>
+              <strong>Launch steps</strong>
+              <p>Climb from idea to release with visible launch steps and blockers.</p>
             </div>
             <span class="chip" data-role="count"></span>
           </div>
           <div class="list" data-role="list"></div>
         </article>
         <article class="card editor-panel" data-role="editor"></article>
+      </section>
+
+      <section class="secondary">
+        <article class="card secondary-panel" data-role="secondary-primary"></article>
+        <article class="card secondary-panel" data-role="secondary-secondary"></article>
       </section>
     </div>
     <script type="module" src="./js/main.js"></script>
