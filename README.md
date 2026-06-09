@@ -36,6 +36,22 @@ Then open <http://localhost:8000>.
 - `N` creates a new launch step
 - `/` focuses the search box
 
+## Generate a launch digest
+
+The board exports each workspace as JSON. A small Node script reads a backup and prints a prioritized digest, so you can review the queue from the terminal or pipe it into another tool.
+
+```bash
+node scripts/launch-digest.mjs examples/sample-backup.json --asof 2026-04-25
+```
+
+The optional `--asof YYYY-MM-DD` flag pins "today" to a fixed date so the digest is deterministic in scripts and CI; omit it to use the current date. The digest excludes released steps from the active queue, applies the same priority formula the board uses, and surfaces the soonest launch and the strongest readiness signal.
+
+The digest module is covered by a small `node:test` suite. Run it with:
+
+```bash
+node --test scripts/launch-digest.test.mjs
+```
+
 ## Privacy
 
 Everything stays in your browser unless you export a JSON backup.

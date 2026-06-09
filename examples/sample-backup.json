@@ -1,0 +1,59 @@
+{
+  "schema": "launch-ladder/v3",
+  "boardTitle": "Launch ladder board",
+  "boardSubtitle": "A local-first board for moving from idea to release without losing track of the blockers.",
+  "items": [
+    {
+      "id": "launch-ladder_sample01",
+      "title": "Narrative lock for homepage",
+      "category": "Idea",
+      "state": "Building",
+      "score": 9,
+      "effort": 4,
+      "metric": 7,
+      "textOne": "Founder",
+      "textTwo": "Headline still too vague",
+      "date": "2026-04-27",
+      "note": "The homepage needs one clear promise before the rest of the launch assets can line up."
+    },
+    {
+      "id": "launch-ladder_sample02",
+      "title": "Launch checklist walkthrough",
+      "category": "Launch",
+      "state": "Ready",
+      "score": 8,
+      "effort": 2,
+      "metric": 8,
+      "textOne": "Ops",
+      "textTwo": "Final browser pass",
+      "date": "2026-04-25",
+      "note": "A visible walkthrough lowers surprise on launch day."
+    },
+    {
+      "id": "launch-ladder_sample03",
+      "title": "Post-launch feedback loop",
+      "category": "Post-launch",
+      "state": "Planned",
+      "score": 7,
+      "effort": 3,
+      "metric": 5,
+      "textOne": "Support",
+      "textTwo": "Choose collection channel",
+      "date": "2026-04-30",
+      "note": "The launch is cleaner when feedback capture is planned before release."
+    },
+    {
+      "id": "launch-ladder_sample04",
+      "title": "Pricing page proof read",
+      "category": "Build",
+      "state": "Released",
+      "score": 6,
+      "effort": 2,
+      "metric": 9,
+      "textOne": "Founder",
+      "textTwo": "—",
+      "date": "2026-04-20",
+      "note": "Shipped after legal review."
+    }
+  ]
+}
