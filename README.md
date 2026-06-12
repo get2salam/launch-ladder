@@ -49,8 +49,16 @@ The optional `--asof YYYY-MM-DD` flag pins "today" to a fixed date so the digest
 The digest module is covered by a small `node:test` suite. Run it with:
 
 ```bash
-node --test scripts/launch-digest.test.mjs
+npm test
 ```
+
+For the same local checks that run in GitHub Actions, use:
+
+```bash
+npm run verify
+```
+
+`npm run verify` executes the test suite and a deterministic sample digest smoke check against `examples/sample-backup.json`.
 
 ## Privacy
 

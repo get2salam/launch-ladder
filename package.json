@@ -1,0 +1,15 @@
+{
+  "name": "launch-ladder",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local-first launch planning workspace with a deterministic digest CLI.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test scripts/launch-digest.test.mjs",
+    "digest:sample": "node scripts/launch-digest.mjs examples/sample-backup.json --asof 2026-04-25",
+    "verify": "npm run test && npm run digest:sample"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
