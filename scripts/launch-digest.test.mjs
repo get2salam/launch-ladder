@@ -1,9 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { buildDigest, priority, renderDigest } from './launch-digest.mjs';
+import { writeDigestArtifact } from './launch-digest-artifact.mjs';
 
 const fixture = {
   items: [
@@ -50,4 +53,22 @@ test('renderDigest produces a digest for the bundled sample backup', async () =>
   assert.match(output, /Active queue \(3\):/);
   assert.match(output, /Launch checklist walkthrough/);
   assert.match(output, /Released: 1/);
+});
+
+test('writeDigestArtifact creates nested CI artifact directories', async () => {
+  const samplePath = fileURLToPath(new URL('../examples/sample-backup.json', import.meta.url));
+  const outputDir = join(tmpdir(), `launch-ladder-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  const outputPath = join(outputDir, 'nested', 'launch-digest.txt');
+
+  try {
+    const result = await writeDigestArtifact(samplePath, outputPath, '2026-04-25');
+    const output = await readFile(outputPath, 'utf8');
+
+    assert.equal(result.outputPath, outputPath);
+    assert.equal(result.bytes, Buffer.byteLength(output));
+    assert.match(output, /Launch Ladder — digest as of 2026-04-25/);
+    assert.match(output, /Soonest launch: 25 Apr — Launch checklist walkthrough/);
+  } finally {
+    await rm(outputDir, { recursive: true, force: true });
+  }
 });

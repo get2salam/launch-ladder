@@ -60,6 +60,12 @@ npm run verify
 
 `npm run verify` executes the test suite and a deterministic sample digest smoke check against `examples/sample-backup.json`.
 
+GitHub Actions also publishes the same deterministic sample digest as a workflow artifact named `launch-digest`. To create that file locally before sharing a run, use:
+
+```bash
+npm run digest:artifact
+```
+
 ## Privacy
 
 Everything stays in your browser unless you export a JSON backup.
