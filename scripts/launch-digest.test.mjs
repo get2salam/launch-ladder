@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildDigest, priority, renderDigest } from './launch-digest.mjs';
+import { buildDigest, priority, renderDigest, sanitizeDigestText } from './launch-digest.mjs';
 import { writeDigestArtifact } from './launch-digest-artifact.mjs';
 
 const fixture = {
@@ -43,6 +43,42 @@ test('buildDigest tolerates a backup with no items array', () => {
   assert.equal(digest.total, 0);
   assert.equal(digest.soonest, null);
   assert.equal(digest.ready, null);
+});
+
+test('sanitizeDigestText strips terminal controls and keeps values single-line', () => {
+  assert.equal(
+    sanitizeDigestText('Launch\u001B[31m\nInjected\t\u0000step'),
+    'Launch Injected step',
+  );
+  assert.equal(sanitizeDigestText('', 'Fallback'), 'Fallback');
+});
+
+test('buildDigest normalizes malformed imported items before rendering', () => {
+  const digest = buildDigest({
+    items: [
+      {
+        title: 'Unsafe\u001B[2J\nTitle',
+        state: 'Ready',
+        score: '999',
+        effort: 'not-a-number',
+        metric: -5,
+        textOne: 'Ops\rLead',
+        textTwo: 'Check\nblocker',
+        date: 'not-a-date',
+      },
+      null,
+    ],
+  }, '2026-04-25');
+  const output = renderDigest(digest);
+
+  assert.equal(digest.active[0].title, 'Unsafe Title');
+  assert.equal(digest.active[0].score, 10);
+  assert.equal(digest.active[0].effort, 3);
+  assert.equal(digest.active[0].metric, 1);
+  assert.equal(digest.active[0].days, 999);
+  assert.match(output, /Unsafe Title \[Ready\] — owner: Ops Lead/);
+  assert.match(output, /Blocker: Check blocker/);
+  assert.doesNotMatch(output, /\u001B|not-a-date|\nTitle/);
 });
 
 test('renderDigest produces a digest for the bundled sample backup', async () => {

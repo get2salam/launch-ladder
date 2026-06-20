@@ -7,6 +7,9 @@ import { readFile } from 'node:fs/promises';
 const COMPLETED_STATES = new Set(['Released']);
 const STATE_WEIGHTS = { Planned: 2, Building: 7, Ready: 10, Released: 3 };
 const METRIC_MAX = 10;
+const ANSI_ESCAPE_PATTERN = /\u001B\[[0-?]*[ -/]*[@-~]/g;
+const CONTROL_CHARACTER_PATTERN = /[\u0000-\u001F\u007F-\u009F]/g;
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 function isoToday() {
   return new Date().toISOString().slice(0, 10);
@@ -14,9 +17,46 @@ function isoToday() {
 
 function daysBetween(today, value) {
   if (!value) return 999;
+  if (!ISO_DATE_PATTERN.test(value)) return 999;
   const a = new Date(`${today}T00:00:00Z`);
   const b = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return 999;
   return Math.round((b - a) / 86400000);
+}
+
+function clampNumber(value, fallback, min = 1, max = 10) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.max(min, Math.min(max, number));
+}
+
+export function sanitizeDigestText(value, fallback = 'Untitled launch step') {
+  const text = String(value ?? '')
+    .normalize('NFKC')
+    .replace(ANSI_ESCAPE_PATTERN, '')
+    .replace(CONTROL_CHARACTER_PATTERN, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return (text || fallback).slice(0, 140);
+}
+
+function safeDate(value) {
+  if (typeof value !== 'string' || !ISO_DATE_PATTERN.test(value)) return '';
+  return Number.isNaN(new Date(`${value}T00:00:00Z`).getTime()) ? '' : value;
+}
+
+function normalizeDigestItem(rawItem = {}) {
+  const item = rawItem && typeof rawItem === 'object' ? rawItem : {};
+  return {
+    title: sanitizeDigestText(item.title),
+    state: sanitizeDigestText(item.state, 'Planned'),
+    score: clampNumber(item.score, 7),
+    effort: clampNumber(item.effort, 3),
+    metric: clampNumber(item.metric, 6),
+    textOne: sanitizeDigestText(item.textOne, 'Unassigned'),
+    textTwo: sanitizeDigestText(item.textTwo, 'No blocker recorded'),
+    date: safeDate(item.date),
+  };
 }
 
 export function priority(item, today) {
@@ -28,7 +68,7 @@ export function priority(item, today) {
 }
 
 export function buildDigest(state, today = isoToday()) {
-  const items = Array.isArray(state?.items) ? state.items : [];
+  const items = Array.isArray(state?.items) ? state.items.map((item) => normalizeDigestItem(item)) : [];
   const active = items
     .filter((item) => !COMPLETED_STATES.has(item.state))
     .map((item) => ({ ...item, priority: priority(item, today), days: daysBetween(today, item.date) }))
