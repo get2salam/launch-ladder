@@ -9,6 +9,7 @@
   </head>
   <body style="--primary:#38bdf8;--secondary:#22d3ee;--panel:#0a141d;--edge:#275976;--glow:rgba(56, 189, 248, 0.22)">
     <div class="shell">
+      <a href="#workspace" class="skip-link">Skip to launch steps</a>
       <header class="topbar">
         <div>
           <p class="eyebrow">Launch planning workspace</p>
@@ -51,7 +52,7 @@
         <button class="btn" type="button" data-action="reset">Re-seed sample</button>
       </section>
 
-      <section class="workspace">
+      <section id="workspace" class="workspace">
         <article class="card list-panel">
           <div class="panel-head">
             <div>
@@ -60,7 +61,7 @@
             </div>
             <span class="chip" data-role="count"></span>
           </div>
-          <div class="list" data-role="list"></div>
+          <div class="list" data-role="list" aria-label="Launch steps"></div>
         </article>
         <article class="card editor-panel" data-role="editor"></article>
       </section>

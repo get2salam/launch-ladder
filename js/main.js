@@ -173,6 +173,8 @@ const refs = {
 const toastHost = (() => {
   const host = document.createElement('div');
   host.className = 'toast-host';
+  host.setAttribute('role', 'status');
+  host.setAttribute('aria-live', 'polite');
   document.body.appendChild(host);
   return host;
 })();
@@ -482,7 +484,7 @@ function renderList(items) {
   }
 
   refs.list.innerHTML = items.map((item) => `
-    <button class="item ${item.id === state.ui.selectedId ? 'is-selected' : ''}" type="button" data-id="${item.id}">
+    <button class="item ${item.id === state.ui.selectedId ? 'is-selected' : ''}" type="button" data-id="${item.id}" aria-pressed="${item.id === state.ui.selectedId}">
       <div class="item-top">
         <strong>${item.title}</strong>
         <span class="score">${priority(item)}</span>
@@ -695,6 +697,17 @@ document.addEventListener('change', async (event) => {
 });
 
 document.addEventListener('keydown', (event) => {
+  if (refs.list.contains(event.target) && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+    event.preventDefault();
+    const buttons = [...refs.list.querySelectorAll('button.item')];
+    const idx = buttons.indexOf(event.target);
+    if (idx === -1) return;
+    const next = event.key === 'ArrowDown' ? buttons[idx + 1] : buttons[idx - 1];
+    if (!next) return;
+    next.focus();
+    commit({ ...state, ui: { ...state.ui, selectedId: next.dataset.id } });
+    return;
+  }
   if (event.target.closest('input, textarea, select')) return;
   if (event.key.toLowerCase() === 'n') {
     event.preventDefault();
