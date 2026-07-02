@@ -316,6 +316,24 @@ function selectedItem() {
   return state.items.find((item) => item.id === state.ui.selectedId) || filteredItems()[0] || null;
 }
 
+function hasActiveFilters() {
+  return Boolean(state.ui.search.trim()) || state.ui.category !== 'all' || state.ui.status !== 'all';
+}
+
+function activeFilterDescription() {
+  const parts = [];
+  const query = state.ui.search.trim();
+  if (query) parts.push(`"${escapeHtml(query)}"`);
+  if (state.ui.category !== 'all') parts.push(escapeHtml(state.ui.category));
+  if (state.ui.status !== 'all') parts.push(escapeHtml(state.ui.status));
+  return parts.join(', ');
+}
+
+function clearFilters() {
+  commit({ ...state, ui: { ...state.ui, search: '', category: 'all', status: 'all' } });
+  showToast('Cleared filters.');
+}
+
 function commit(nextState) {
   state = nextState;
   if (!state.ui.selectedId && state.items[0]) state.ui.selectedId = state.items[0].id;
@@ -474,8 +492,15 @@ function renderInsights(items) {
 
 function renderList(items) {
   if (!items.length) {
-    refs.list.innerHTML = `
-      <div class="empty">
+    const filtered = hasActiveFilters() && state.items.length > 0;
+    refs.list.innerHTML = filtered ? `
+      <div class="empty" role="status">
+        <strong>No matches for ${activeFilterDescription()}</strong>
+        <p>Try a different search term, or clear the filters to see every ${SPEC.itemLabel}.</p>
+        <button class="btn" type="button" data-action="clear-filters">Clear filters</button>
+      </div>
+    ` : `
+      <div class="empty" role="status">
         <strong>${SPEC.emptyTitle}</strong>
         <p>${SPEC.emptyBody}</p>
       </div>
@@ -558,19 +583,19 @@ function renderEditor(item) {
         </label>
         <label class="field range-wrap">
           <span>${SPEC.metric.label}</span>
-          <input type="range" min="${SPEC.metric.min}" max="${SPEC.metric.max}" data-item-field="metric" value="${item.metric}" />
+          <input type="range" min="${SPEC.metric.min}" max="${SPEC.metric.max}" data-item-field="metric" value="${item.metric}" aria-valuetext="${item.metric} of ${SPEC.metric.max} ${SPEC.metric.label.toLowerCase()}" />
           <output>${item.metric} / ${SPEC.metric.max}</output>
         </label>
       </div>
       <div class="field-grid three">
         <label class="field range-wrap">
           <span>${SPEC.labels.score}</span>
-          <input type="range" min="1" max="10" data-item-field="score" value="${item.score}" />
+          <input type="range" min="1" max="10" data-item-field="score" value="${item.score}" aria-valuetext="${item.score} of 10 ${SPEC.labels.score.toLowerCase()}" />
           <output>${item.score} / 10</output>
         </label>
         <label class="field range-wrap">
           <span>${SPEC.labels.effort}</span>
-          <input type="range" min="1" max="10" data-item-field="effort" value="${item.effort}" />
+          <input type="range" min="1" max="10" data-item-field="effort" value="${item.effort}" aria-valuetext="${item.effort} of 10 ${SPEC.labels.effort.toLowerCase()}" />
           <output>${item.effort} / 10</output>
         </label>
         <label class="field range-wrap">
@@ -658,6 +683,7 @@ document.addEventListener('click', (event) => {
   if (explicit === 'remove-current') { removeSelected(); return; }
   if (explicit === 'export') { exportState(); return; }
   if (explicit === 'import') { refs.importFile.click(); return; }
+  if (explicit === 'clear-filters') { clearFilters(); return; }
 
   const actionId = event.target.closest('[data-action-id]')?.dataset.actionId;
   if (actionId) {

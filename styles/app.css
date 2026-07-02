@@ -283,6 +283,10 @@ textarea {
   border: 1px dashed rgba(255,255,255,0.12);
 }
 
+.empty .btn {
+  margin-top: 12px;
+}
+
 .editor-panel,
 .secondary-panel {
   min-height: 100%;
